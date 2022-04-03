@@ -2,21 +2,11 @@
 
 require "n_plus_one_control/version"
 require "n_plus_one_control/executor"
+require "n_plus_one_control/query"
+require "n_plus_one_control/collector"
 
 # RSpec and Minitest matchers to prevent N+1 queries problem.
 module NPlusOneControl
-  # Used to extract a table name from a query
-  EXTRACT_TABLE_RXP = /(insert into|update|delete from|from) ['"`](\S+)['"`]/i.freeze
-
-  # Used to convert a query part extracted by the regexp above to the corresponding
-  # human-friendly type
-  QUERY_PART_TO_TYPE = {
-    "insert into" => "INSERT",
-    "update" => "UPDATE",
-    "delete from" => "DELETE",
-    "from" => "SELECT"
-  }.freeze
-
   class << self
     attr_accessor :default_scale_factors, :verbose, :show_table_stats, :ignore, :event,
       :backtrace_cleaner, :backtrace_length, :truncate_query_size
@@ -51,10 +41,7 @@ module NPlusOneControl
 
       before, after = runs.map do |queries|
         queries.group_by do |query|
-          matches = query.match(EXTRACT_TABLE_RXP)
-          next unless matches
-
-          "  #{matches[2]} (#{QUERY_PART_TO_TYPE[matches[1].downcase]})"
+          query.to_usage
         end.transform_values(&:count)
       end
 
@@ -83,20 +70,10 @@ module NPlusOneControl
 
     private
 
-    def truncate_query(sql)
-      return sql unless truncate_query_size
+    def truncate_query(query)
+      return query unless truncate_query_size
 
-      # Only truncate query, leave tracing (if any) as is
-      parts = sql.split(/(\s+↳)/)
-
-      parts[0] =
-        if truncate_query_size < 4
-          "..."
-        else
-          parts[0][0..(truncate_query_size - 4)] + "..."
-        end
-
-      parts.join
+      query.truncated
     end
   end
 
@@ -110,14 +87,6 @@ module NPlusOneControl
   # Print table hits difference
   self.show_table_stats = true
 
-  # Ignore matching queries
-  self.ignore = /^(BEGIN|COMMIT|SAVEPOINT|RELEASE)/
-
-  # ActiveSupport notifications event to track queries.
-  # We track ActiveRecord event by default,
-  # but can also track rom-rb events ('sql.rom') as well.
-  self.event = "sql.active_record"
-
   # Default query filtering applied if none provided explicitly
   self.default_matching = ENV["NPLUSONE_FILTER"] || /^SELECT/i
 
@@ -126,6 +95,15 @@ module NPlusOneControl
 
   # Define the number of backtrace lines to show
   self.backtrace_length = ENV.fetch("NPLUSONE_BACKTRACE", 1).to_i
+
+  # [DEPRECATED] Ignore matching queries, moved to active record collector
+  # TODO: extract configuration to by collector
+  self.ignore = /^(BEGIN|COMMIT|SAVEPOINT|RELEASE)/
+
+  # [DEPRECATED] ActiveSupport notifications event to track queries.
+  # We track ActiveRecord event by default,
+  # but can also track rom-rb events ('sql.rom') as well.
+  self.event = "sql.active_record"
 end
 
-require "n_plus_one_control/railtie" if defined?(Rails::Railtie)
+require "n_plus_one_control/railtie" if defined?(Rails)
