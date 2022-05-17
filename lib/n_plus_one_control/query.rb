@@ -2,6 +2,8 @@
 
 module NPlusOneControl
   class Query
+    attr_reader :target, :action, :raw, :detail
+
     def initialize(detail = {})
       @detail = detail
       @target, @action, @raw, @raw_with_backtrace = @detail.values_at(:target, :action, :raw, :raw_with_backtrace)

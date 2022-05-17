@@ -10,9 +10,9 @@ module NPlusOneControl
       LOG_CMD_PREFIX = /([a-z0-9_]+)\..+/.freeze
 
       QUERY_REGEX_INSERT = /"(insert)"=>"([a-z0-9_]+)".+"(documents)"=>(.+)/.freeze
-      QUERY_REGEX_DELETE = /"(delete)"=>"([a-z0-9_]+)".+"(deletes)"=>(.+), "\$db"=>"([a-z0-9_]+)"/.freeze
-      QUERY_REGEX_DISTINCT = /"(distinct)"=>"([a-zA-Z0-9\-_]+)".+"(query)"=>(.+), "\$db"=>"([a-z0-9_]+)"/.freeze
-      QUERY_REGEX_FIND_INSERT_COUNT = /"(find|insert|count)"=>"([a-z0-9_]+)".+"(filter|query)"=>(.+), "\$db"=>"([a-z0-9_]+)"/.freeze
+      QUERY_REGEX_DELETE = /"(delete)"=>"([a-z0-9_]+)".+"(deletes)"=>(.+)(, "\$db"=>"[a-z0-9_]+")?/.freeze
+      QUERY_REGEX_DISTINCT = /"(distinct)"=>"([a-zA-Z0-9\-_]+)".+"(query)"=>(.+)(, "\$db"=>"[a-z0-9_]+")?/.freeze
+      QUERY_REGEX_FIND_INSERT_COUNT = /"(find|insert|count)"=>"([a-z0-9_]+)".+"(filter|query)"=>(.+)(, "\$db"=>"[a-z0-9_]+")?/.freeze
 
       def self.topic
         MONGODB_CMD_EVENT
