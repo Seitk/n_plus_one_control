@@ -18,16 +18,16 @@ module NPlusOneControl
     class << self
       def adapters
         return @adapters unless @adapters.nil?
-        
+
         @adapters = {}
-  
+
         %w[ActiveRecord Mongoid].each do |k|
           klass = k.safe_constantize
           if klass.present?
             @adapters[k.underscore.to_sym] = "::NPlusOneControl::Collectors::#{k}".constantize.new
           end
         end
-  
+
         @adapters
       end
 

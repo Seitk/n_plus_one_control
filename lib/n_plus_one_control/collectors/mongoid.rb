@@ -3,10 +3,10 @@
 module NPlusOneControl
   module Collectors
     class Mongoid < Base
-      MONGODB_CMD_EVENT = 'cmd.mongodb'.freeze
+      MONGODB_CMD_EVENT = "cmd.mongodb"
 
-      LOG_PLATFORM_MONGO = 'MONGODB'.freeze
-      LOG_SEGMENT_START = 'STARTED'.freeze
+      LOG_PLATFORM_MONGO = "MONGODB"
+      LOG_SEGMENT_START = "STARTED"
       LOG_CMD_PREFIX = /([a-z0-9_]+)\..+/.freeze
 
       QUERY_REGEX_INSERT = /"(insert)"=>"([a-z0-9_]+)".+"(documents)"=>(.+)/.freeze
@@ -19,7 +19,7 @@ module NPlusOneControl
       end
 
       def parse_log(pattern, _name, _start, _finish, _message_id, values)
-        platform, _, cmd_with_db, event, payload = values.split('|').map(&:strip)
+        platform, _, cmd_with_db, event, payload = values.split("|").map(&:strip)
         return unless platform.try(:strip) == LOG_PLATFORM_MONGO
 
         query = nil
@@ -38,10 +38,10 @@ module NPlusOneControl
 
       def parse_operation(db, raw)
         [QUERY_REGEX_FIND_INSERT_COUNT, QUERY_REGEX_DISTINCT, QUERY_REGEX_INSERT, QUERY_REGEX_DELETE].each do |reg|
-          cmd, collection, _, criteria = raw.scan(reg).flatten
+          cmd, collection, _, _criteria = raw.scan(reg).flatten
           if cmd.present?
             return ::NPlusOneControl::Query.new({
-              target: [db, collection].join('.'),
+              target: [db, collection].join("."),
               action: cmd,
               raw: raw
             })

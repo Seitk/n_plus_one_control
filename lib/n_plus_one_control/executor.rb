@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative './collector'
+require_relative "./collector"
 
 module NPlusOneControl
   # Runs code for every scale factor
   # and returns collected queries.
   class Executor
-      class << self
+    class << self
       attr_accessor :transaction_begin
       attr_accessor :transaction_rollback
     end

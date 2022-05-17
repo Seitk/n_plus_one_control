@@ -3,7 +3,7 @@
 module NPlusOneControl
   module Collectors
     class ActiveRecord < Base
-      ACTIVE_RECORD_SQL_EVENT = 'sql.active_record'.freeze
+      ACTIVE_RECORD_SQL_EVENT = "sql.active_record"
       PARSABLE_EVENT_NAME = %w[CACHE SCHEMA].freeze
       IGNORE_QUERY_MATCHES = /^(BEGIN|COMMIT|SAVEPOINT|RELEASE)/.freeze
 
@@ -18,7 +18,6 @@ module NPlusOneControl
         "delete from" => "DELETE",
         "from" => "SELECT"
       }.freeze
-      
 
       def self.topic
         ACTIVE_RECORD_SQL_EVENT
