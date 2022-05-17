@@ -19,7 +19,7 @@ module NPlusOneControl
       end
 
       def self.topic
-        raise "#{self.name} does not implement #topic"
+        raise "#{name} does not implement #topic"
       end
 
       private

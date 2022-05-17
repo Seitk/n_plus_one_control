@@ -15,7 +15,7 @@ module NPlusOneControl # :nodoc:
         Rails.application.configure do
           config.after_initialize do
             # Change Mongoid log destination and/or level
-            Mongo::Logger.logger = Logger.new(STDOUT).tap do |logger|
+            Mongo::Logger.logger = Logger.new($stdout).tap do |logger|
               logger.level = Logger::DEBUG
               logger.formatter = proc { |severity, datetime, progname, msg|
                 ::NPlusOneControl::Collector.mongoid.publish(msg)
